@@ -14,7 +14,5 @@ const loggerOptions = {
   ),
 };
 
-module.exports = {
-  expressLogger: expressWinston.logger(loggerOptions),
-  winstonLogger: winston.createLogger(loggerOptions),
-};
+export const expressLogger = expressWinston.logger(loggerOptions);
+export const winstonLogger = winston.createLogger(loggerOptions);

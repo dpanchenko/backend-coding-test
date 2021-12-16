@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 
-const { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } = '../constants';
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '../constants';
 
-const router = express.Router();
+export const ridesRouter = express.Router();
 
 /**
  * @swagger
@@ -71,7 +71,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Ride'
  */
-router.post('/rides', (req, res) => {
+ridesRouter.post('/rides', (req, res) => {
   const startLatitude = Number(req.body.start_lat);
   const startLongitude = Number(req.body.start_long);
   const endLatitude = Number(req.body.end_lat);
@@ -120,7 +120,7 @@ router.post('/rides', (req, res) => {
     req.body.rider_name, req.body.driver_name, req.body.driver_vehicle,
   ];
 
-  req.app.locals.db.run('INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)', values, (err) => {
+  req.app.locals.db.run('INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)', values, function callback(err) {
     if (err) {
       return res.send({
         error_code: 'SERVER_ERROR',
@@ -172,14 +172,14 @@ router.post('/rides', (req, res) => {
  *       404:
  *         description: no rides found
  */
-router.get('/rides', (req, res) => {
-  const { page, count = DEFAULT_PAGE_SIZE } = req.query;
+ridesRouter.get('/rides', (req, res) => {
+  const { page, count } = req.query;
 
-  let parsedPage = parseInt(page, 10);
+  let parsedPage = parseInt(page as string, 10);
   if (Number.isNaN(parsedPage) || parsedPage < 1) {
     parsedPage = 1;
   }
-  let parsedCount = parseInt(count, 10);
+  let parsedCount = parseInt(count as string, 10);
   if (Number.isNaN(parsedCount) || parsedCount < 1) {
     parsedCount = DEFAULT_PAGE_SIZE;
   }
@@ -233,7 +233,7 @@ router.get('/rides', (req, res) => {
  *       404:
  *         description: ride can not be found
  */
-router.get('/rides/:id', (req, res) => {
+ridesRouter.get('/rides/:id', (req, res) => {
   req.app.locals.db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, (err, rows) => {
     if (err) {
       return res.send({
@@ -252,5 +252,3 @@ router.get('/rides/:id', (req, res) => {
     res.send(rows);
   });
 });
-
-module.exports = router;

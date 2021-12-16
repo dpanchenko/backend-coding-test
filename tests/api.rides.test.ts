@@ -1,21 +1,16 @@
-const request = require('supertest');
+import request from 'supertest';
+import DB from 'sqlite3';
+import { app }  from '../src/app';
+import { buildSchemas } from '../src/schemas';
 
-const sqlite3 = require('sqlite3').verbose();
-
-const db = new sqlite3.Database(':memory:');
-
-const app = require('../src/app');
-const buildSchemas = require('../src/schemas');
+const sqlite = DB.verbose();
+const db = new sqlite.Database(':memory:');
 
 app.locals.db = db;
 
 describe('API rides tests', () => {
   before((done) => {
-    db.serialize((err) => {
-      if (err) {
-        return done(err);
-      }
-
+    db.serialize(() => {
       buildSchemas(db);
 
       done();
