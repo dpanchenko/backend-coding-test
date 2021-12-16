@@ -3,27 +3,19 @@
 const express = require('express');
 const swaggerUI = require('swagger-ui-express');
 
-const app = express();
 const port = 8010;
-
-const bodyParser = require('body-parser');
-const jsonParser = bodyParser.json();
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
 
-const swaggerSpecification = require('./src/swagger');
 const buildSchemas = require('./src/schemas');
-const { expressLogger, winstonLogger } = require('./src/logger');
+const { winstonLogger } = require('./src/logger');
+const app = require('./src/app');
 
 db.serialize(() => {
     buildSchemas(db);
 
-    app.use(expressLogger);
-
-    require('./src/app')(app, db);
-
-    app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerSpecification));
+    app.locals.db = db;
 
     app.listen(port, () => winstonLogger.info(`App started and listening on port ${port}`));
 });
