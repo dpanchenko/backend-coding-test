@@ -1,8 +1,13 @@
 import express, { Request, Response } from 'express';
 
-import { createRide, getRideById, getRides } from './service';
+import {
+  createRide,
+  getRideById,
+  getRides,
+  validatePayload,
+} from './service';
 import { IRideDto, IRideEntity } from './types';
-import { IErrorResponse } from '../../types';
+import { IErrorResponse, IValidationResult } from '../../types';
 
 const router = express.Router();
 
@@ -74,58 +79,24 @@ const router = express.Router();
  *                 $ref: '#/components/schemas/Ride'
  */
 router.post('/rides', async (req: Request, res: Response<IRideEntity | IErrorResponse>) => {
-  const startLatitude = Number(req.body.start_lat);
-  const startLongitude = Number(req.body.start_long);
-  const endLatitude = Number(req.body.end_lat);
-  const endLongitude = Number(req.body.end_long);
-  const riderName = req.body.rider_name;
-  const driverName = req.body.driver_name;
-  const driverVehicle = req.body.driver_vehicle;
-
-  if (startLatitude < -90 || startLatitude > 90 || startLongitude < -180 || startLongitude > 180) {
-    return res.send({
-      error_code: 'VALIDATION_ERROR',
-      message: 'Start latitude and longitude must be between -90 - 90 and -180 to 180 degrees respectively',
-    });
-  }
-
-  if (endLatitude < -90 || endLatitude > 90 || endLongitude < -180 || endLongitude > 180) {
-    return res.send({
-      error_code: 'VALIDATION_ERROR',
-      message: 'End latitude and longitude must be between -90 - 90 and -180 to 180 degrees respectively',
-    });
-  }
-
-  if (typeof riderName !== 'string' || riderName.length < 1) {
-    return res.send({
-      error_code: 'VALIDATION_ERROR',
-      message: 'Rider name must be a non empty string',
-    });
-  }
-
-  if (typeof driverName !== 'string' || driverName.length < 1) {
-    return res.send({
-      error_code: 'VALIDATION_ERROR',
-      message: 'Rider name must be a non empty string',
-    });
-  }
-
-  if (typeof driverVehicle !== 'string' || driverVehicle.length < 1) {
-    return res.send({
-      error_code: 'VALIDATION_ERROR',
-      message: 'Rider name must be a non empty string',
-    });
-  }
-
   const data: IRideDto = {
-    start_lat: req.body.start_lat,
-    start_long: req.body.start_long,
-    end_lat: req.body.end_lat,
-    end_long: req.body.end_long,
+    start_lat: Number(req.body.start_lat),
+    start_long: Number(req.body.start_long),
+    end_lat: Number(req.body.end_lat),
+    end_long: Number(req.body.end_long),
     rider_name: req.body.rider_name,
     driver_name: req.body.driver_name,
     driver_vehicle: req.body.driver_vehicle,
   };
+
+  const validationResult: IValidationResult = validatePayload(data);
+
+  if (!validationResult.valid) {
+    return res.status(400).send({
+      error_code: 'VALIDATION_ERROR',
+      message: validationResult.message,
+    });
+  }
 
   const ride = await createRide(data);
 
@@ -167,13 +138,6 @@ router.get('/rides', async (req: Request, res: Response<IRideEntity[] | IErrorRe
   const { page, count } = req.query;
   const ridesList = await getRides(page as string, count as string);
 
-  if (ridesList.length === 0) {
-    return res.send({
-      error_code: 'RIDES_NOT_FOUND_ERROR',
-      message: 'Could not find any rides',
-    });
-  }
-
   return res.send(ridesList);
 });
 
@@ -206,7 +170,7 @@ router.get('/rides/:id', async (req: Request, res: Response<IRideEntity | IError
   const rider = await getRideById(parseInt(req.params.id, 10));
 
   if (!rider) {
-    return res.send({
+    return res.status(404).send({
       error_code: 'RIDES_NOT_FOUND_ERROR',
       message: 'Could not find any rides',
     });
