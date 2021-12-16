@@ -24,7 +24,7 @@ export const getRides = async (page?: number | string, count?: number | string):
   }
 
   const limit = (parsedPage - 1) * parsedCount;
-  const rows = await dbAllAsync(`SELECT * FROM Rides LIMIT ${limit},${parsedCount}`);
+  const rows = await dbAllAsync('SELECT * FROM Rides LIMIT ?,?', [limit, parsedCount]);
 
   return rows as IRideEntity[];
 };

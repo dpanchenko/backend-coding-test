@@ -66,95 +66,114 @@ describe('rides service tests', () => {
   });
 
   describe('getRideById method', () => {
+    let stubAllAsync;
+
+    before(() => {
+      stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
+    });
+    after(() => {
+      stubAllAsync.restore();
+    });
+
     it('return ride info', async () => {
-      const stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
       const rideId = 1;
 
       const result = await getRideById(rideId);
 
       expect(stubAllAsync.callCount).to.equal(1);
       expect(result).to.deep.equal(ridesList[0]);
-
-      stubAllAsync.restore();
     });
   });
 
   describe('getRides method', () => {
+    let stubAllAsync;
+
+    before(() => {
+      stubAllAsync = sinon.stub(db, 'dbAllAsync');
+    });
+    after(() => {
+      stubAllAsync.restore();
+    });
+    afterEach(() => {
+      stubAllAsync.reset();
+    });
+
     it('return rides info without pagination params', async () => {
-      const stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
+      stubAllAsync.returns(Promise.resolve(ridesList));
 
       const result = await getRides();
 
       expect(stubAllAsync.callCount).to.equal(1);
-      expect(stubAllAsync.withArgs(`SELECT * FROM Rides LIMIT 0,${DEFAULT_PAGE_SIZE}`).callCount).to.equal(1);
+      expect(stubAllAsync.withArgs('SELECT * FROM Rides LIMIT ?,?', [0, DEFAULT_PAGE_SIZE]).callCount).to.equal(1);
       expect(result).to.deep.equal(ridesList);
-
-      stubAllAsync.restore();
     });
 
     it('return rides info with wrong page number and without count on pages param', async () => {
-      const stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
-      const page = 'a';
+      stubAllAsync.returns(Promise.resolve(ridesList));
 
+      const page = 'a';
       const result = await getRides(page);
 
       expect(stubAllAsync.callCount).to.equal(1);
-      expect(stubAllAsync.withArgs(`SELECT * FROM Rides LIMIT 0,${DEFAULT_PAGE_SIZE}`).callCount).to.equal(1);
+      expect(stubAllAsync.withArgs('SELECT * FROM Rides LIMIT ?,?', [0, DEFAULT_PAGE_SIZE]).callCount).to.equal(1);
       expect(result).to.deep.equal(ridesList);
-
-      stubAllAsync.restore();
     });
 
     it('return rides info without count on pages param', async () => {
-      const stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
-      const page = 3;
+      stubAllAsync.returns(Promise.resolve(ridesList));
 
+      const page = 3;
       const result = await getRides(page);
 
       expect(stubAllAsync.callCount).to.equal(1);
-      expect(stubAllAsync.withArgs(`SELECT * FROM Rides LIMIT ${DEFAULT_PAGE_SIZE * (page - 1)},${DEFAULT_PAGE_SIZE}`).callCount).to.equal(1);
+      expect(stubAllAsync.withArgs('SELECT * FROM Rides LIMIT ?,?', [DEFAULT_PAGE_SIZE * (page - 1), DEFAULT_PAGE_SIZE]).callCount).to.equal(1);
       expect(result).to.deep.equal(ridesList);
-
-      stubAllAsync.restore();
     });
 
     it('return rides info with wrong count on pages param', async () => {
-      const stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
+      stubAllAsync.returns(Promise.resolve(ridesList));
+
       const page = 3;
       const count = 3000;
-
       const result = await getRides(page, count);
 
       expect(stubAllAsync.callCount).to.equal(1);
-      expect(stubAllAsync.withArgs(`SELECT * FROM Rides LIMIT ${MAX_PAGE_SIZE * (page - 1)},${MAX_PAGE_SIZE}`).callCount).to.equal(1);
+      expect(stubAllAsync.withArgs('SELECT * FROM Rides LIMIT ?,?', [MAX_PAGE_SIZE * (page - 1), MAX_PAGE_SIZE]).callCount).to.equal(1);
       expect(result).to.deep.equal(ridesList);
-
-      stubAllAsync.restore();
     });
 
     it('return rides info with incorrect count on pages param', async () => {
-      const stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
+      stubAllAsync.returns(Promise.resolve(ridesList));
+
       const page = 2;
       const count = 'qwe';
-
       const result = await getRides(page, count);
 
       expect(stubAllAsync.callCount).to.equal(1);
-      expect(stubAllAsync.withArgs(`SELECT * FROM Rides LIMIT ${DEFAULT_PAGE_SIZE * (page - 1)},${DEFAULT_PAGE_SIZE}`).callCount).to.equal(1);
+      expect(stubAllAsync.withArgs('SELECT * FROM Rides LIMIT ?,?', [DEFAULT_PAGE_SIZE * (page - 1), DEFAULT_PAGE_SIZE]).callCount).to.equal(1);
       expect(result).to.deep.equal(ridesList);
-
-      stubAllAsync.restore();
     });
   });
 
   describe('createRide method', () => {
+    let stubRunAsync;
+    let stubAllAsync;
+
+    before(() => {
+      stubRunAsync = sinon.stub(db, 'dbRunAsync');
+      stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
+    });
+    after(() => {
+      stubRunAsync.restore();
+      stubAllAsync.restore();
+    });
+
     it('create ride and return ride info', async () => {
       const lastID = 1;
       const { start_lat, start_long, end_lat, end_long, rider_name, driver_name, driver_vehicle } = validRidePayload; // eslint-disable-line
       const values = [start_lat, start_long, end_lat, end_long, rider_name, driver_name, driver_vehicle];
 
-      const stubRunAsync = sinon.stub(db, 'dbRunAsync').returns(Promise.resolve({ lastID }));
-      const stubAllAsync = sinon.stub(db, 'dbAllAsync').returns(Promise.resolve(ridesList));
+      stubRunAsync.returns(Promise.resolve({ lastID }));
 
       const result = await createRide(validRidePayload);
 
@@ -163,9 +182,6 @@ describe('rides service tests', () => {
       expect(stubAllAsync.callCount).to.equal(1);
       expect(stubAllAsync.withArgs('SELECT * FROM Rides WHERE rideID = ?', lastID).callCount).to.equal(1);
       expect(result).to.deep.equal(ridesList[0]);
-
-      stubRunAsync.restore();
-      stubAllAsync.restore();
     });
   });
 });

@@ -1,3 +1,13 @@
+export const validRidePayloadWithSqlInjection = {
+  start_lat: 0,
+  start_long: 0,
+  end_lat: 0,
+  end_long: 0,
+  rider_name: "Rider's!; SELECT * FROM Riders;", // eslint-disable-line
+  driver_name: 'Driver); SELECT * FROM Riders;(',
+  driver_vehicle: 'Vehicle',
+};
+
 export const validRidePayload = {
   start_lat: 0,
   start_long: 0,
