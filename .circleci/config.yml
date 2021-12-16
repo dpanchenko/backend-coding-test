@@ -24,6 +24,3 @@ workflows:
   deploy_development:
     jobs:
       - check
-      - build:
-          requires:
-            - check
