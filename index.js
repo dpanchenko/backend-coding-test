@@ -14,12 +14,17 @@ const db = new sqlite3.Database(':memory:');
 
 const swaggerSpecification = require('./src/swagger');
 const buildSchemas = require('./src/schemas');
+const { expressLogger, winstonLogger } = require('./src/logger');
 
 db.serialize(() => {
     buildSchemas(db);
 
-    const app = require('./src/app')(db);
+    app.use(jsonParser);
+    app.use(expressLogger);
+
+    require('./src/app')(app, db);
+
     app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerSpecification));
 
-    app.listen(port, () => console.log(`App started and listening on port ${port}`));
+    app.listen(port, () => winstonLogger.info(`App started and listening on port ${port}`));
 });
