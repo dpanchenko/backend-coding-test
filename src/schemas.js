@@ -1,5 +1,52 @@
 'use strict';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Ride:
+ *       type: object
+ *       properties:
+ *         rideID:
+ *           type: integer
+ *           description: The auto-generated id of a ride
+ *         startLat:
+ *           type: integer
+ *           description: Start lat of the ride
+ *         startLong:
+ *           type: integer
+ *           description: Start long of the ride
+ *         endLat:
+ *           type: integer
+ *           description: End lat of the ride
+ *         endLong:
+ *           type: integer
+ *           description: End long of the ride
+ *         riderName:
+ *           type: string
+ *           description: Rider's name
+ *         driverName:
+ *           type: string
+ *           description: Driver's name
+ *         driverVehicle:
+ *           type: string
+ *           description: Driver's vehicle
+ *         created:
+ *           type: date
+ *           description: Created at timestamp
+ *       example:
+ *         rideID: 1
+ *         startLat: 10.123
+ *         startLong: 10.123
+ *         endLat: 11.123
+ *         endLong: 11.123
+ *         riderName: Rider
+ *         driverName: Driver
+ *         driverVehicle: Vehicle
+ *         created: 2021-12-15 00:00:00
+ *
+ */
+
 module.exports = (db) => {
     const createRideTableSchema = `
         CREATE TABLE Rides

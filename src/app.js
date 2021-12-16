@@ -6,9 +6,85 @@ const app = express();
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
-module.exports = (db) => {
-    app.get('/health', (req, res) => res.send('Healthy'));
+/**
+ * @swagger
+ *  tags:
+ *   name: Rides
+ *   description: rides
+ */
 
+module.exports = (db) => {
+    /**
+     * @swagger
+     * /health:
+     *   get:
+     *     description: Healthcheck
+     *     responses:
+     *       200:
+     *         description: Returns a "Healthy" message.
+     */
+     app.get('/health', (req, res) => res.send('Healthy'));
+
+    /**
+     * @swagger
+     * /rides:
+     *   post:
+     *     summary: Create a ride
+     *     tags: [Rides]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - start_lat
+     *               - start_long
+     *               - end_lat
+     *               - end_long
+     *               - rider_name
+     *               - driver_name
+     *               - driver_vehicle
+     *             properties:
+     *               start_lat:
+     *                 type: integer
+     *                 description: Start lat of the ride
+     *               start_long:
+     *                 type: integer
+     *                 description: Start long of the ride
+     *               end_lat:
+     *                 type: integer
+     *                 description: End lat of the ride
+     *               end_long:
+     *                 type: integer
+     *                 description: End long of the ride
+     *               rider_name:
+     *                 type: string
+     *                 description: Rider's name
+     *               driver_name:
+     *                 type: string
+     *                 description: Driver's name
+     *               driver_vehicle:
+     *                 type: string
+     *                 description: Driver's vehicle
+     *             example:
+     *               start_lat: 10.123
+     *               start_long: 10.123
+     *               end_lat: 11.123
+     *               end_long: 11.123
+     *               rider_name: Rider
+     *               driver_name: Driver
+     *               driver_vehicle: Vehicle
+     *     responses:
+     *       200:
+     *         description: Returns a created ride object.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Ride'
+     */
     app.post('/rides', jsonParser, (req, res) => {
         const startLatitude = Number(req.body.start_lat);
         const startLongitude = Number(req.body.start_long);
@@ -76,6 +152,24 @@ module.exports = (db) => {
         });
     });
 
+    /**
+     * @swagger
+     * /rides:
+     *   get:
+     *     summary: All rides list
+     *     tags: [Rides]
+     *     responses:
+     *       200:
+     *         description: list of rides
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Ride'
+     *       404:
+     *         description: no rides found
+     */
     app.get('/rides', (req, res) => {
         db.all('SELECT * FROM Rides', function (err, rows) {
             if (err) {
@@ -96,6 +190,31 @@ module.exports = (db) => {
         });
     });
 
+    /**
+     * @swagger
+     * /rides/{id}:
+     *   get:
+     *     summary: Ride data by id
+     *     tags: [Rides]
+     *     parameters:
+     *       - in : path
+     *         name: id
+     *         description: id of ride
+     *         schema:
+     *           type: integer
+     *         required: true
+     *     responses:
+     *       200:
+     *         description: rides by its id
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/Ride'
+     *       404:
+     *         description: ride can not be found
+     */
     app.get('/rides/:id', (req, res) => {
         db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, function (err, rows) {
             if (err) {
