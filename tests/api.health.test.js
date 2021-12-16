@@ -9,7 +9,7 @@ const buildSchemas = require('../src/schemas');
 
 app.locals.db = db;
 
-describe('API tests', () => {
+describe('API health tests', () => {
   before((done) => {
     db.serialize((err) => {
       if (err) {
