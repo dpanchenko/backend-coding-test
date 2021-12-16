@@ -1,3 +1,5 @@
+import { Database } from 'sqlite3';
+
 /**
  * @swagger
  * components:
@@ -44,7 +46,7 @@
  *         created: 2021-12-15 00:00:00
  *
  */
-export default (db) => {
+export default (db: Database): Database => {
   const createRideTableSchema = `
         CREATE TABLE Rides
         (
