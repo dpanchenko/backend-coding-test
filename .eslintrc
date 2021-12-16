@@ -17,6 +17,7 @@
   },
   "rules": {
     "consistent-return": 0,
+    "import/prefer-default-export": 0,
     "max-len": 0,
     "no-shadow": 0,
     "no-underscore-dangle": 0,
