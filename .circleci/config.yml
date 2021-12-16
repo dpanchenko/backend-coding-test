@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  check:
+    working_directory: ~/app
+    docker:
+      - image: circleci/node:14.18.1
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: install-npm
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: check
+          command: npm run lint; npm run coverage
+
+workflows:
+  version: 2
+  deploy_development:
+    jobs:
+      - check
+      - build:
+          requires:
+            - check

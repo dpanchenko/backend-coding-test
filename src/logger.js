@@ -4,7 +4,7 @@ const winston = require('winston');
 const loggerOptions = {
   transports: [
       new winston.transports.File({
-          filename: `${__dirname}/logs/app.log`,
+          filename: `${__dirname}/../logs/app.log`,
       }),
       new winston.transports.Console(),
   ],
