@@ -1,5 +1,6 @@
 node_modules
- .nyc_output
- logs
- coverage
- public
+.nyc_output
+logs
+coverage
+public
+dist

@@ -44,7 +44,7 @@
  *         created: 2021-12-15 00:00:00
  *
  */
-export const buildSchemas = (db) => {
+export default (db) => {
   const createRideTableSchema = `
         CREATE TABLE Rides
         (

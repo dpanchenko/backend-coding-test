@@ -2,7 +2,7 @@ import express from 'express';
 
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '../constants';
 
-export const ridesRouter = express.Router();
+const router = express.Router();
 
 /**
  * @swagger
@@ -71,7 +71,7 @@ export const ridesRouter = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Ride'
  */
-ridesRouter.post('/rides', (req, res) => {
+router.post('/rides', (req, res) => {
   const startLatitude = Number(req.body.start_lat);
   const startLongitude = Number(req.body.start_long);
   const endLatitude = Number(req.body.end_lat);
@@ -172,7 +172,7 @@ ridesRouter.post('/rides', (req, res) => {
  *       404:
  *         description: no rides found
  */
-ridesRouter.get('/rides', (req, res) => {
+router.get('/rides', (req, res) => {
   const { page, count } = req.query;
 
   let parsedPage = parseInt(page as string, 10);
@@ -233,7 +233,7 @@ ridesRouter.get('/rides', (req, res) => {
  *       404:
  *         description: ride can not be found
  */
-ridesRouter.get('/rides/:id', (req, res) => {
+router.get('/rides/:id', (req, res) => {
   req.app.locals.db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, (err, rows) => {
     if (err) {
       return res.send({
@@ -252,3 +252,5 @@ ridesRouter.get('/rides/:id', (req, res) => {
     res.send(rows);
   });
 });
+
+export default router;

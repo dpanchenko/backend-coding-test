@@ -1,7 +1,7 @@
 import request from 'supertest';
 import DB from 'sqlite3';
-import { app }  from '../src/app';
-import { buildSchemas } from '../src/schemas';
+import app from '../src/app';
+import buildSchemas from '../src/schemas';
 
 const sqlite = DB.verbose();
 const db = new sqlite.Database(':memory:');

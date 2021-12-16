@@ -1,6 +1,6 @@
 import express from 'express';
 
-export const healthRouter = express.Router();
+const router = express.Router();
 
 /**
  * @swagger
@@ -19,4 +19,6 @@ export const healthRouter = express.Router();
  *       200:
  *         description: Returns a "Healthy" message.
  */
-healthRouter.get('/health', (req, res) => res.send('Healthy'));
+router.get('/health', (req, res) => res.send('Healthy'));
+
+export default router;
