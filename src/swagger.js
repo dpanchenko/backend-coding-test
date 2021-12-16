@@ -16,7 +16,9 @@ const options = {
   },
   apis: [
     './src/app.js',
-    './src/schemas.js'
+    './src/schemas.js',
+    './src/routes/health.js',
+    './src/routes/rides.js',
   ],
 };
 
