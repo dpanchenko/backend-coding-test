@@ -11,13 +11,14 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha tests",
+    "test": "nyc npm run mocha",
     "start": "node index.js",
     "lint": "eslint .",
-    "coverage": "nyc npm test"
+    "mocha": "mocha tests"
   },
   "pre-push": [
-    "coverage"
+    "lint",
+    "test"
   ],
   "keywords": [
     "Xendit"
