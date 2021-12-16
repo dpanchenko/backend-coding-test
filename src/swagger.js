@@ -1,5 +1,7 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 
+const config = require('./config');
+
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -9,7 +11,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:8010',
+        url: `http://localhost:${config.port}`,
         description: 'Taxi Rides API',
       },
     ],
