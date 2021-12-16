@@ -24,4 +24,4 @@ const options = {
   ],
 };
 
-export const swaggerSpecification = swaggerJsdoc(options);
+export default swaggerJsdoc(options);

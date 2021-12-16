@@ -1,9 +1,9 @@
-const sqlite3 = require('sqlite3').verbose();
-
 import config from './config';
-import { app } from './app';
-import { buildSchemas } from './schemas';
+import app from './app';
+import buildSchemas from './schemas';
 import { winstonLogger } from './logger';
+
+const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database(':memory:');
 
