@@ -1,5 +1,11 @@
 'use strict';
 
+const express = require('express');
+const app = express();
+
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+
 /**
  * @swagger
  *  tags:
@@ -7,7 +13,7 @@
  *   description: rides
  */
 
-module.exports = (app, db) => {
+module.exports = (db) => {
     /**
      * @swagger
      * /health:
@@ -79,7 +85,7 @@ module.exports = (app, db) => {
      *               items:
      *                 $ref: '#/components/schemas/Ride'
      */
-    app.post('/rides', (req, res) => {
+    app.post('/rides', jsonParser, (req, res) => {
         const startLatitude = Number(req.body.start_lat);
         const startLongitude = Number(req.body.start_long);
         const endLatitude = Number(req.body.end_lat);

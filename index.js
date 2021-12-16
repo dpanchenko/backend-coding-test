@@ -19,7 +19,6 @@ const { expressLogger, winstonLogger } = require('./src/logger');
 db.serialize(() => {
     buildSchemas(db);
 
-    app.use(jsonParser);
     app.use(expressLogger);
 
     require('./src/app')(app, db);
