@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @swagger
  * components:
@@ -48,7 +46,7 @@
  */
 
 module.exports = (db) => {
-    const createRideTableSchema = `
+  const createRideTableSchema = `
         CREATE TABLE Rides
         (
         rideID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,7 +61,7 @@ module.exports = (db) => {
         )
     `;
 
-    db.run(createRideTableSchema);
+  db.run(createRideTableSchema);
 
-    return db;
+  return db;
 };

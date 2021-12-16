@@ -3,14 +3,14 @@ const winston = require('winston');
 
 const loggerOptions = {
   transports: [
-      new winston.transports.File({
-          filename: `${__dirname}/../logs/app.log`,
-      }),
-      new winston.transports.Console(),
+    new winston.transports.File({
+      filename: `${__dirname}/../logs/app.log`,
+    }),
+    new winston.transports.Console(),
   ],
   format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.json(),
+    winston.format.colorize(),
+    winston.format.json(),
   ),
 };
 
