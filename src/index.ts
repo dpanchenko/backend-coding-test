@@ -1,16 +1,13 @@
+import sqlite3 from 'sqlite3';
 import config from './config';
 import app from './app';
 import buildSchemas from './schemas';
 import { winstonLogger } from './logger';
 
-const sqlite3 = require('sqlite3').verbose();
-
-const db = new sqlite3.Database(':memory:');
+const db = new (sqlite3.verbose()).Database(':memory:');
 
 db.serialize(() => {
-  buildSchemas(db);
-
-  app.locals.db = db;
+  app.locals.db = buildSchemas(db);
 
   app.listen(config.port, () => winstonLogger.info(`App started and listening on port ${config.port}`));
 });
