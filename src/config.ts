@@ -1,5 +1,5 @@
 require('dotenv').config();
 
-module.exports = {
+export default {
   port: parseInt(process.env.PORT, 10) || 8010,
 };

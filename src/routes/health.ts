@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 
-const router = express.Router();
+export const healthRouter = express.Router();
 
 /**
  * @swagger
@@ -19,6 +19,4 @@ const router = express.Router();
  *       200:
  *         description: Returns a "Healthy" message.
  */
-router.get('/health', (req, res) => res.send('Healthy'));
-
-module.exports = router;
+healthRouter.get('/health', (req, res) => res.send('Healthy'));
