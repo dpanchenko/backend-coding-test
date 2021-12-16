@@ -1,7 +1,7 @@
 {
-  "name": "backend-coding-test",
+  "name": "backend-api-taxi",
   "version": "1.0.0",
-  "description": "A coding assessment for Xendit backend interviews",
+  "description": "Taxi API",
   "main": "index.js",
   "directories": {
     "test": "tests"
