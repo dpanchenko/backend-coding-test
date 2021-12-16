@@ -1,20 +1,14 @@
 import request from 'supertest';
 import sqlite3 from 'sqlite3';
 import app from '../src/app';
-import buildSchemas from '../src/schemas';
+import { initializeDb } from '../src/db';
 
 const db = new (sqlite3.verbose()).Database(':memory:');
 
 app.locals.db = db;
 
 describe('API rides tests', () => {
-  before((done) => {
-    db.serialize(() => {
-      buildSchemas(db);
-
-      done();
-    });
-  });
+  before(async () => initializeDb());
 
   describe('POST /rides', () => {
     it('should create rides', (done) => {

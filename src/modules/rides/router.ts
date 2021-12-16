@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
 
-import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '../constants';
-import { dbAllAsync, dbRunAsync } from '../db';
+import { createRide, getRideById, getRides } from './service';
+import { IRideDto, IRideEntity } from './types';
+import { IErrorResponse } from '../../types';
 
 const router = express.Router();
 
@@ -72,7 +73,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Ride'
  */
-router.post('/rides', async (req: Request, res: Response) => {
+router.post('/rides', async (req: Request, res: Response<IRideEntity | IErrorResponse>) => {
   const startLatitude = Number(req.body.start_lat);
   const startLongitude = Number(req.body.start_long);
   const endLatitude = Number(req.body.end_lat);
@@ -116,15 +117,19 @@ router.post('/rides', async (req: Request, res: Response) => {
     });
   }
 
-  const values = [
-    req.body.start_lat, req.body.start_long, req.body.end_lat, req.body.end_long,
-    req.body.rider_name, req.body.driver_name, req.body.driver_vehicle,
-  ];
+  const data: IRideDto = {
+    start_lat: req.body.start_lat,
+    start_long: req.body.start_long,
+    end_lat: req.body.end_lat,
+    end_long: req.body.end_long,
+    rider_name: req.body.rider_name,
+    driver_name: req.body.driver_name,
+    driver_vehicle: req.body.driver_vehicle,
+  };
 
-  const result = await dbRunAsync('INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)', values);
-  const rows = await dbAllAsync('SELECT * FROM Rides WHERE rideID = ?', result.lastID);
+  const ride = await createRide(data);
 
-  return res.send(rows);
+  return res.send(ride);
 });
 
 /**
@@ -158,32 +163,18 @@ router.post('/rides', async (req: Request, res: Response) => {
  *       404:
  *         description: no rides found
  */
-router.get('/rides', async (req: Request, res: Response) => {
+router.get('/rides', async (req: Request, res: Response<IRideEntity[] | IErrorResponse>) => {
   const { page, count } = req.query;
+  const ridesList = await getRides(page as string, count as string);
 
-  let parsedPage = parseInt(page as string, 10);
-  if (Number.isNaN(parsedPage) || parsedPage < 1) {
-    parsedPage = 1;
-  }
-  let parsedCount = parseInt(count as string, 10);
-  if (Number.isNaN(parsedCount) || parsedCount < 1) {
-    parsedCount = DEFAULT_PAGE_SIZE;
-  }
-  if (parsedCount > MAX_PAGE_SIZE) {
-    parsedCount = MAX_PAGE_SIZE;
-  }
-
-  const limit = (parsedPage - 1) * parsedCount;
-  const rows = await dbAllAsync(`SELECT * FROM Rides LIMIT ${limit},${parsedCount}`);
-
-  if (rows.length === 0) {
+  if (ridesList.length === 0) {
     return res.send({
       error_code: 'RIDES_NOT_FOUND_ERROR',
       message: 'Could not find any rides',
     });
   }
 
-  return res.send(rows);
+  return res.send(ridesList);
 });
 
 /**
@@ -211,17 +202,17 @@ router.get('/rides', async (req: Request, res: Response) => {
  *       404:
  *         description: ride can not be found
  */
-router.get('/rides/:id', async (req: Request, res: Response) => {
-  const rows = await dbAllAsync(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`);
+router.get('/rides/:id', async (req: Request, res: Response<IRideEntity | IErrorResponse>) => {
+  const rider = await getRideById(parseInt(req.params.id, 10));
 
-  if (rows.length === 0) {
+  if (!rider) {
     return res.send({
       error_code: 'RIDES_NOT_FOUND_ERROR',
       message: 'Could not find any rides',
     });
   }
 
-  return res.send(rows);
+  return res.send(rider);
 });
 
 export default router;
