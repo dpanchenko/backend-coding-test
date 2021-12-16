@@ -1,5 +1,7 @@
 const express = require('express');
 
+const { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } = '../constants';
+
 const router = express.Router();
 
 /**
@@ -145,6 +147,19 @@ router.post('/rides', (req, res) => {
  *   get:
  *     summary: All rides list
  *     tags: [Rides]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Requested page
+ *       - in: query
+ *         name: count
+ *         schema:
+ *           type: integer
+ *           default: 10
+*         description: Count items on page
  *     responses:
  *       200:
  *         description: list of rides
@@ -158,7 +173,23 @@ router.post('/rides', (req, res) => {
  *         description: no rides found
  */
 router.get('/rides', (req, res) => {
-  req.app.locals.db.all('SELECT * FROM Rides', (err, rows) => {
+  const { page, count = DEFAULT_PAGE_SIZE } = req.query;
+
+  let parsedPage = parseInt(page, 10);
+  if (Number.isNaN(parsedPage) || parsedPage < 1) {
+    parsedPage = 1;
+  }
+  let parsedCount = parseInt(count, 10);
+  if (Number.isNaN(parsedCount) || parsedCount < 1) {
+    parsedCount = DEFAULT_PAGE_SIZE;
+  }
+  if (parsedCount > MAX_PAGE_SIZE) {
+    parsedCount = MAX_PAGE_SIZE;
+  }
+
+  const limit = (parsedPage - 1) * parsedCount;
+
+  req.app.locals.db.all(`SELECT * FROM Rides LIMIT ${limit},${parsedCount}`, (err, rows) => {
     if (err) {
       return res.send({
         error_code: 'SERVER_ERROR',
