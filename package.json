@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Taxi API",
   "main": "index.js",
+  "engines": {
+    "node": "14.x.x",
+    "npm": "6.x.x"
+  },
   "directories": {
     "test": "tests"
   },
