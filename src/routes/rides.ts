@@ -1,6 +1,7 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '../constants';
+import { dbAllAsync, dbRunAsync } from '../db';
 
 const router = express.Router();
 
@@ -71,7 +72,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Ride'
  */
-router.post('/rides', (req, res) => {
+router.post('/rides', async (req: Request, res: Response) => {
   const startLatitude = Number(req.body.start_lat);
   const startLongitude = Number(req.body.start_long);
   const endLatitude = Number(req.body.end_lat);
@@ -120,25 +121,10 @@ router.post('/rides', (req, res) => {
     req.body.rider_name, req.body.driver_name, req.body.driver_vehicle,
   ];
 
-  req.app.locals.db.run('INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)', values, function callback(err) {
-    if (err) {
-      return res.send({
-        error_code: 'SERVER_ERROR',
-        message: 'Unknown error',
-      });
-    }
+  const result = await dbRunAsync('INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)', values);
+  const rows = await dbAllAsync('SELECT * FROM Rides WHERE rideID = ?', result.lastID);
 
-    req.app.locals.db.all('SELECT * FROM Rides WHERE rideID = ?', this.lastID, (err, rows) => {
-      if (err) {
-        return res.send({
-          error_code: 'SERVER_ERROR',
-          message: 'Unknown error',
-        });
-      }
-
-      res.send(rows);
-    });
-  });
+  return res.send(rows);
 });
 
 /**
@@ -172,7 +158,7 @@ router.post('/rides', (req, res) => {
  *       404:
  *         description: no rides found
  */
-router.get('/rides', (req, res) => {
+router.get('/rides', async (req: Request, res: Response) => {
   const { page, count } = req.query;
 
   let parsedPage = parseInt(page as string, 10);
@@ -188,24 +174,16 @@ router.get('/rides', (req, res) => {
   }
 
   const limit = (parsedPage - 1) * parsedCount;
+  const rows = await dbAllAsync(`SELECT * FROM Rides LIMIT ${limit},${parsedCount}`);
 
-  req.app.locals.db.all(`SELECT * FROM Rides LIMIT ${limit},${parsedCount}`, (err, rows) => {
-    if (err) {
-      return res.send({
-        error_code: 'SERVER_ERROR',
-        message: 'Unknown error',
-      });
-    }
+  if (rows.length === 0) {
+    return res.send({
+      error_code: 'RIDES_NOT_FOUND_ERROR',
+      message: 'Could not find any rides',
+    });
+  }
 
-    if (rows.length === 0) {
-      return res.send({
-        error_code: 'RIDES_NOT_FOUND_ERROR',
-        message: 'Could not find any rides',
-      });
-    }
-
-    res.send(rows);
-  });
+  return res.send(rows);
 });
 
 /**
@@ -233,24 +211,17 @@ router.get('/rides', (req, res) => {
  *       404:
  *         description: ride can not be found
  */
-router.get('/rides/:id', (req, res) => {
-  req.app.locals.db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, (err, rows) => {
-    if (err) {
-      return res.send({
-        error_code: 'SERVER_ERROR',
-        message: 'Unknown error',
-      });
-    }
+router.get('/rides/:id', async (req: Request, res: Response) => {
+  const rows = await dbAllAsync(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`);
 
-    if (rows.length === 0) {
-      return res.send({
-        error_code: 'RIDES_NOT_FOUND_ERROR',
-        message: 'Could not find any rides',
-      });
-    }
+  if (rows.length === 0) {
+    return res.send({
+      error_code: 'RIDES_NOT_FOUND_ERROR',
+      message: 'Could not find any rides',
+    });
+  }
 
-    res.send(rows);
-  });
+  return res.send(rows);
 });
 
 export default router;

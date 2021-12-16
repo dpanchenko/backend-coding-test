@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 
 const router = express.Router();
 
@@ -19,6 +19,6 @@ const router = express.Router();
  *       200:
  *         description: Returns a "Healthy" message.
  */
-router.get('/health', (req, res) => res.send('Healthy'));
+router.get('/health', (req: Request, res: Response) => res.send('Healthy'));
 
 export default router;

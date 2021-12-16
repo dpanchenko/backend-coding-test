@@ -17,7 +17,9 @@
   },
   "rules": {
     "consistent-return": 0,
+    "max-len": 0,
     "no-shadow": 0,
+    "no-underscore-dangle": 0,
     "global-require": 0,
     "@typescript-eslint/no-shadow": 0
   }
