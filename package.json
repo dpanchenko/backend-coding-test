@@ -17,6 +17,7 @@
     "start:prod": "node dist/index.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "mocha -r ts-node/register tests/**/*.ts",
     "test:cov": "nyc npm test",
     "test:load": "npm run build; npm run forever:start; npm run test:artillery; npm run forever:stop; npm run clean",
