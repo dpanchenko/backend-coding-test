@@ -11,12 +11,18 @@
     "test": "tests"
   },
   "scripts": {
+    "prebuild": "npm run clean",
+    "clean": "rimraf dist",
     "build": "tsc",
     "start:prod": "node dist/index.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "lint": "eslint .",
     "test": "mocha -r ts-node/register tests/**/*.ts",
-    "test:cov": "nyc npm test"
+    "test:cov": "nyc npm test",
+    "test:load": "npm run build; npm run forever:start; npm run test:artillery; npm run forever:stop; npm run clean",
+    "test:artillery": "artillery run artillery.yaml",
+    "forever:start": "forever start dist/index.js",
+    "forever:stop": "forever stopall"
   },
   "prestart": "npm run build",
   "pre-push": [
@@ -29,10 +35,13 @@
   "author": "Bo",
   "license": "ISC",
   "dependencies": {
+    "artillery": "^2.0.0-7",
     "body-parser": "^1.19.0",
     "dotenv": "^10.0.0",
     "express": "^4.16.4",
     "express-winston": "^4.2.0",
+    "forever": "^4.0.1",
+    "rimraf": "^3.0.2",
     "sinon": "^12.0.1",
     "sqlite3": "^4.0.6",
     "swagger-jsdoc": "^6.1.0",

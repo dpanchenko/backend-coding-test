@@ -1,0 +1,28 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - duration: 30
+      arrivalRate: 100
+      name: Sustained load
+scenarios:
+  - name: "Flow"
+    flow:
+      - get:
+          url: "/health"
+      - get:
+          url: "/rides"
+      - post:
+          url: "/rides"
+          json:
+            start_lat: "10.23"
+            start_long: "10.23"
+            end_lat: "11.23"
+            end_long: "11.23"
+            rider_name: "Rider"
+            driver_name: "Driver"
+            driver_vehicle: "Vehicle"
+          capture:
+            - json: "$.results.id"
+              as: "rideId"
+      - get:
+          url: "/rides/{{ rideId }}"
