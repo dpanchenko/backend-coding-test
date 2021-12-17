@@ -17,10 +17,10 @@ const options = {
     ],
   },
   apis: [
-    './src/app.js',
-    './src/schemas.js',
-    './src/routes/health.js',
-    './src/routes/rides.js',
+    './src/app.ts',
+    './src/schemas.ts',
+    './src/modules/health/router.ts',
+    './src/modules/rides/router.ts',
   ],
 };
 
